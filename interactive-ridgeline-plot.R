@@ -34,6 +34,41 @@ score_colors <- c(
   "#c49c94"
 )
 
+#standardize data turns Max value = 1 and Min value = 0
+standardize_data <- function( db_file ) {
+  MaxVal <- 0.0
+  MinVal <- 0.0
+
+  # loops over all the columns in db_file
+  for ( col in seq_len( ncols( db_file ) ) ) {
+
+      MaxVal <- 0.0
+      MinVal <- 0.0
+
+    # Finds the minimum and maximum values in each column for part 2
+    for ( row in seq_len( nrows( db_file ) ) ) {
+      item <- db_file[ row, col ]
+
+      if( item > MaxVal ){
+        MaxVal <- item
+      }else if( item < minVal ){
+        MinVal <- item
+      }
+    }
+
+    # does the following ( item - MinVal ) / ( MaxVal - MinVal ) = new data
+    divisor <- ( MaxVal - MinVal )
+    if (divisr != 0) {
+      for ( row in seq_len( nrows( db_file ) ) ) {
+        item <- db_file[ row, col ]
+        db_file[ row, col ] <- (( item - MinVal ) / divisor )
+      }
+    }
+  }
+
+  return ( db_file )
+}
+
 # Load and prepare data
 load_data <- function(db_file, include_text_type = TRUE) {
   con <- dbConnect(RSQLite::SQLite(), db_file)
