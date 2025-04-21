@@ -43,7 +43,7 @@ standardize_data <- function( de_file ) {
   for ( col in seq_len( ncol( db_file.data ) ) ) {
 
       MaxVal <- 0.0
-      MinVal <- 0.0
+      MinVal <- db_file.data[ 0, col ]
 
     # Finds the minimum and maximum values in each column for part 2
     for ( row in seq_len( nrow( db_file.data ) ) ) {
