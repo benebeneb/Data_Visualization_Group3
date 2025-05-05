@@ -5,6 +5,34 @@
 #                    "shinyjs","tidyverse","ggridges",
 #                    "RColorBrewer","readr"))
 
+library(fresh)
+my_theme <- create_theme(
+  bs4dash_vars(
+    navbar_light_color = "#219EBC",
+    navbar_light_active_color = "#FFB703",
+    navbar_light_hover_color = "#FB8500"
+  ),
+  bs4dash_yiq(
+    contrasted_threshold = 10,
+    text_dark = "#023047"
+  ),
+  bs4dash_color(
+    blue     = "#219EBC",   # Primary accents
+    red      = "#FB8500",   # Alerts or callouts
+    green    = "#8ECAE6",   # Success or mild notifications
+    yellow   = "#FFB703",   # Highlights
+    gray_900 = "#023047",   # Base text
+    gray_800 = "#FFB703",   # Secondary text
+    lightblue = "#F8F9FA"   # Background
+  )
+)
+
+
+
+
+
+
+
 library(bs4Dash)
 library(shiny)
 library(shinyWidgets)
@@ -17,19 +45,35 @@ library(stringr)
 
 ## ---------- 1.  HELPERS -------------------------------------------------- ##
 score_columns <- c(
-  "flesch_kincaid_grade","flesch_reading_ease","gunning_fog",
-  "smog_index","dale_chall","avg_sentence_length","avg_word_length",
-  "lexical_density","type_token_ratio","passive_ratio",
-  "subordinate_clauses","errors","transitions","subjectivity",
+  "flesch_kincaid_grade", "flesch_reading_ease", "gunning_fog",
+  "smog_index","dale_chall",
+  "lexical_density","passive_ratio","errors","transitions","subjectivity",
   "formality","complexity"
 )
 score_labels  <- c(
-  "F‑K Grade","F‑K Ease","Gunning Fog","SMOG","Dale‑Chall",
-  "Avg Sent Len","Avg Word Len","Lexical Density","TTR",
-  "Passive Ratio","Sub‑Clauses","Errors","Transitions",
+  "F‑K Grade","F‑K Ease", "Gunning Fog","SMOG","Dale‑Chall","Lexical Density",
+  "Passive Ratio","Errors","Transitions",
   "Subjectivity","Formality","Complexity"
 )
-score_colors  <- c(brewer.pal(9,"Set1"), brewer.pal(7,"Set2"))
+score_colors <- c(
+  "#219EBC",  # Blue
+  "#FB8500",  # Orange
+  "#FFB703",  # Yellow
+  "#8ECAE6",  # Teal
+  "#023047",  # Navy
+  "#FFB703",  # Yellow
+  "#FB8500",  # Orange
+  "#219EBC",  # Blue
+  "#8ECAE6",  # Teal
+  "#023047",  # Navy
+  "#FFB703",  # Yellow
+  "#FB8500",  # Orange
+  "#8ECAE6",  # Teal
+  "#219EBC",  # Blue
+  "#FFB703",  # Yellow
+  "#FB8500"   # Orange
+)
+
 
 load_data <- function(csv){
   dat <- read_csv(csv, show_col_types = FALSE)
@@ -64,11 +108,37 @@ ui <- bs4DashPage(
   
   body = bs4DashBody(
     useShinyjs(),
+    use_theme(my_theme),
     tags$head(tags$style(HTML("
-      .left-panel{border-right:2px dashed #d3d3d3;height:100%;}
-      .logo-img{max-width:80px;display:block;margin:0 auto 10px;}
-      .score-buttons .btn{margin:0 2px 4px 0;}
-    "))),
+  .left-panel {
+    border-right: 2px dashed #d3d3d3;
+    height: 100%;
+    padding-right: 10px;
+  }
+  .logo-img {
+    max-width: 100px;
+    margin: 0 auto 20px;
+    display: block;
+  }
+  .score-buttons .btn {
+    margin: 2px 6px 6px 0;
+    border-radius: 20px !important;
+  }
+  .value-box-custom .small-box {
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 1px 2px 6px rgba(0,0,0,0.1);
+  }
+  .bttn-primary {
+    background-color: #007bff !important;
+    color: white !important;
+  }
+  .bttn-default {
+    background-color: #f0f0f0 !important;
+    color: black !important;
+  }
+")))
+    ,
     br(),
     
     ## model selector ------------------------------------------------------
@@ -80,7 +150,8 @@ ui <- bs4DashPage(
                selected = "4o",
                status   = "primary",
                justified= TRUE,
-               size     = "lg"
+               size     = "lg",
+               individual=TRUE
              )
       )
     ),
@@ -91,16 +162,17 @@ ui <- bs4DashPage(
               ## LEFT mini‑sidebar
               column(width = 2,
                      div(class = "left-panel",
-                         tags$img(src = "logo.png", class = "logo-img"),
-                         h4(class = "text-center", "Bounty Hunters"), hr(),
+                         tags$img(src = "bounty_hunters_logo.png", class = "logo-img", style = "max-width: 180px; display: block; margin: 0 auto 20px;"),
+                         #h4(class = "text-center", "Bounty Hunters"), hr(),
                          h5("Filter text type"),
                          radioGroupButtons(
                            "txt_filter",
                            choices  = c(Both = "both", Prompts = "prompt", Responses = "response"),
                            selected = "response",
-                           status   = "secondary",
+                           status   = "primary",
                            direction= "vertical",
-                           size     = "sm"
+                           size     = "sm",
+                           individual = TRUE
                          )
                      )
               ),
@@ -123,7 +195,7 @@ ui <- bs4DashPage(
                               plotOutput("ridge_all", height = "420px"),
                               plotOutput("hist_plot",  height = "220px")
                        ),
-                       
+                       #“default”, “primary”, “warning”, “danger”, “success”, “royal”
                        # RIGHT: buttons + compare ridge + scatter
                        column(width = 5,
                               h4("Score Selection"),
@@ -132,7 +204,7 @@ ui <- bs4DashPage(
                                     actionBttn(
                                       paste0("score_", i), score_labels[i],
                                       style = "material-flat", size = "xs",
-                                      color = if(i == 1) "primary" else "default"
+                                      color = if(i == 1) "warning" else "default"
                                     )
                                   })
                               ),
@@ -145,7 +217,8 @@ ui <- bs4DashPage(
     )
   ),
   
-  footer = bs4DashFooter()
+  footer = bs4DashFooter(),
+  controlbar = NULL,
 )
 
 ## ---------- 3.  SERVER --------------------------------------------------- ##
@@ -187,7 +260,7 @@ server <- function(input, output, session){
   output$box_word <- renderbs4ValueBox({
     bs4ValueBox(
       safe_mean(current_data()$avg_word_length, 1),
-      "Avg Word Length", icon("sort-alpha-down"), color = "secondary")
+      "Avg Word Length", icon("sort-alpha-down"), color = "warning")
   })
   output$box_ttr <- renderbs4ValueBox({
     bs4ValueBox(
@@ -203,10 +276,9 @@ server <- function(input, output, session){
   ## ridgeline (all scores) -------------------------------------------------
   # ---- RIDGELINE : all scores (robust, no unused levels) ------------------
   output$ridge_all <- renderPlot({
-    
     dat <- current_data(); req(nrow(dat) > 0)
     
-    ## 1. keep metrics that have ≥2 distinct numeric values
+    # 1. Keep metrics that have ≥2 distinct numeric values
     valid_cols <- score_columns[
       vapply(dat[score_columns], function(v){
         v <- v[!is.na(v)]
@@ -214,34 +286,41 @@ server <- function(input, output, session){
       }, logical(1))
     ]
     if(length(valid_cols) == 0){
-      plot.new(); text(.5,.5,"No numeric variation to plot"); return()
+      plot.new(); text(.5, .5, "No numeric variation to plot"); return()
     }
     
-    ## 2. corresponding labels + colours (same order)
+    # 2. Corresponding labels and colors
     valid_labels <- score_labels[match(valid_cols, score_columns)]
     valid_colors <- score_colors[match(valid_labels, score_labels)]
     
-    ## 3. long format with *only* those metrics, factor rebuilt
-    dat_long <- dat |>
-      select(all_of(valid_cols)) |>
-      pivot_longer(everything(), names_to = "Score", values_to = "Value") |>
+    # 3. Normalize each column (min-max scaling)
+    dat_scaled <- dat %>%
+      mutate(across(all_of(valid_cols), ~ (. - min(., na.rm = TRUE)) / (max(., na.rm = TRUE) - min(., na.rm = TRUE))))
+    
+    # 4. Long format
+    dat_long <- dat_scaled %>%
+      select(all_of(valid_cols)) %>%
+      pivot_longer(everything(), names_to = "Score", values_to = "Value") %>%
       mutate(Score = factor(Score, levels = valid_cols, labels = valid_labels))
     
-    ## 4. plot
+    # 5. Plot
     ggplot(dat_long, aes(Value, Score, fill = Score)) +
-      geom_density_ridges(scale = 2.8, alpha = 0.75) +
+      geom_density_ridges(scale = 3.5, alpha = 0.75, rel_min_height = 0.01) +
       scale_fill_manual(values = valid_colors, drop = FALSE) +
       labs(
         title = paste(
           "All readability scores –",
           c(`4o` = "4‑o", `4o_mini` = "4‑o‑mini", `corpus` = "Corpus")[input$model_sel]
         ),
-        x = "Score value", y = NULL
+        x = "Normalized Score Value", y = NULL
       ) +
       theme_minimal(base_size = 13) +
-      theme(legend.position = "none",
-            plot.title = element_text(hjust = .5, face = "bold"))
+      theme(
+        legend.position = "none",
+        plot.title = element_text(hjust = .5, face = "bold")
+      )
   })
+  
   
   
   ## ridgeline (selected score across datasets) ----------------------------
@@ -259,9 +338,9 @@ server <- function(input, output, session){
     ) |>
       ggplot(aes(.data[[sel]], Dataset, fill = Dataset)) +
       geom_density_ridges_gradient(scale = 3, gradient_lwd = 1, calc_ecdf = TRUE, alpha = 0.75) +
-      scale_fill_manual(values = c("4‑o" = "#1f77b4",
-                                   "4‑o‑mini" = "#ff7f0e",
-                                   "Corpus" = "#2ca02c")) +
+      scale_fill_manual(values = c("4‑o" = "#FFB703",
+                                   "4‑o‑mini" = "#219EBC",
+                                   "Corpus" = "#FB8500")) +
       labs(title = paste(lab, "across datasets"), x = "Score value", y = NULL) +
       theme_minimal(base_size = 13) +
       theme(legend.position = "none",
@@ -273,7 +352,7 @@ server <- function(input, output, session){
     d <- current_data()
     if(nrow(d) == 0){ plot.new(); text(.5,.5,"No data"); return() }
     ggplot(d, aes(complexity)) +
-      geom_histogram(bins = 25, alpha = .85, fill = "#2ca02c") +
+      geom_histogram(bins = 25, alpha = .85, fill = "#FFB703") +
       labs(title = "Complexity", x = NULL, y = NULL) +
       theme_minimal(base_size = 13) +
       theme(plot.title = element_text(hjust = .5, face = "bold"))
