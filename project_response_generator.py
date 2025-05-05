@@ -5,20 +5,15 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from tqdm import tqdm
 
 # Initialize DeepSeek API client
-openai.api_key = 'sk-416aab8b28ca46dba7afadd0c85fb921'
+openai.api_key = 'sk-41656j46...NO_API_KEY_FOR_YOU'
 openai.api_base = 'https://api.deepseek.com/v1'
 
 # Connect to the prompts database
 conn_prompts = sqlite3.connect('/Users/ethan/Desktop/CMSC 436 (Data Viz)/Project/Responses/deepseek-responses.db')
 cursor_prompts = conn_prompts.cursor()
 
-# Fetch prompts
-# Batch 1: ids 1-1935
-# Batch 2: ids 1936-1978
-# Batch 3: ids 1979-3233
-# Batch 4: ids 3234-3625
-# 5: 3626-?
-cursor_prompts.execute("SELECT id, prompt FROM prompts WHERE id >= 3716")
+# Fetch Prompts
+cursor_prompts.execute("SELECT id, prompt FROM prompts")
 prompts = cursor_prompts.fetchall()
 
 # Ensure the responses table exists
