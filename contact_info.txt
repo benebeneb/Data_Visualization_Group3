@@ -1,0 +1,6 @@
+NAME,			            EMAIL,			          GITHUB
+Annamaria Palmiert,	  apalmie1@umbc.edu,	  apalmiero
+Benjamin Bolster,		  benb4@umbc.edu,		    benebeneb
+Connor Slinger,		    kd17574@umbc.edu,	    kd17574
+Ethan Weisgerber	  	ethanw7@umbc.edu,	    EthanWeisgerber
+William Zheng,		    wzheng2@umbc.edu,	    wzheng22
